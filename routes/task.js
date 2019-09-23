@@ -6,24 +6,50 @@ const List = require("../models/List");
 // Intialing Routes
 const router = express.Router();
 
+function fun(strA, strB, callback) {
+  let temp = "";
+
+  if (strA === strB || strB.length === 0) {
+    callback(true);
+  } else {
+    for (let i = 0; i < strB.length; i++) {
+      for (let j = 0; j < strA.length; j++) {
+        if (strB[i] === strA[j]) {
+          temp += strA[j];
+        }
+      }
+    }
+
+    const result = temp === strB ? true : false;
+
+    callback(result);
+  }
+  // console.log(temp);
+}
+
 // Routers in action
 router.get("/list", (req, res) => {
   res.send("List from the task routes");
 });
 
-router.post("/add", (req, res) => {
-  const list = new List({
-    strA: req.body.strA,
-    strB: req.body.strB
-  });
+router.post("/add", async (req, res, next) => {
+  fun(req.body.strA, req.body.strB, function(result) {
+    if (!result) {
+      return res.status(200).json({ result: false });
+    }
 
-  try {
-    list.save().then(data => {
-      res.status(200).json(data);
+    const list = new List({
+      strA: req.body.strA,
+      strB: req.body.strB
     });
-  } catch (err) {
-    res.status(500).send(err);
-  }
+    try {
+      list.save().then(data => {
+        res.status(200).json({ result: true });
+      });
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  });
 });
 
 // Exporting the router
