@@ -30,11 +30,10 @@ function fun(strA, strB, callback) {
 // Routers in action
 router.get("/list", (req, res) => {
   const lists = List.find({}, (err, lists) => {
-    let listMap = {};
-    lists.forEach(list => {
-      listMap[{ strA, strB }] = list;
-    });
-    res.send(listMap);
+    if (err) {
+      res.send(err);
+    }
+    res.json({ lists });
   });
 });
 
